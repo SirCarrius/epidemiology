@@ -2,7 +2,7 @@ import nltk, os, json, csv, string, cPickle
 from scipy.stats import scoreatpercentile
 
 from pprint import pprint
-from progress.bar import Bar
+#from progress.bar import Bar
 READ = 'rb'
 WRITE = 'wb'
 stopwords = set(open('stopwords',READ).read().splitlines())
@@ -10,15 +10,16 @@ exclude = set(string.punctuation)
 
 #lemmatizer
 lmtzr = nltk.stem.wordnet.WordNetLemmatizer()
-base = '/Volumes/My Book/carrie-controls/'
+base = 'C:\Users\Carrie0731\Desktop\JSON FILES\json'
 #get the names of the files in a list
 json_list = [os.path.join(base,datafile)
 			 for datafile in 
 			 filter(lambda string: string.endswith('json'),os.listdir(base))]
+			 
 #wordList: each tweet
 def sanitize(wordList): 
 	#Lemmatize
-	answer = [lmtzr.lemmatize(word.lower()) for word in list(set(wordList)-exclude)] #testing membership is faster in set
+	answer = [word.translate(None, string.punctuation) for word in wordList] #testing membership is faster in set
 	
 	#Remove stopwords
 	answer = list(set(answer)-stopwords)
@@ -28,19 +29,27 @@ def sanitize(wordList):
 
 	#Remove links
 	answer = [word for word in answer if 'http://' not in word]
+	answer = [lmtzr.lemmatize(word.lower()) for word in answer]
 	return answer
 
 words = []
-bar = Bar('Converting JSON files to proper text',max=len(json_list))
+#bar = Bar('Converting JSON files to proper text',max=len(json_list))
 for filename in json_list:
 	words.extend([sanitize(' '.join([tweet['text']
 			for tweet in json.load(open(filename,READ))]).split())])
-	bar.next()
-bar.finish()
+#bar.next()
+#bar.finish()
 
+
+
+#line graph: freq.plot(10) -> 10 most common words
+#test if Mike's code works
+#open cPickle file
 words = [item for sublist in words for item in sublist]
 freq = nltk.FreqDist(words)
 cutoff = scoreatpercentile(freq.values(),15)
+print cutoff
 vocab = [word for word,f in freq.items() if f > cutoff] 
-cPickle.dump({'distribution':freq,'cutoff':cutoff},open('freqdist.pkl',WRITE))
+#make it freqdist_2 -> different file
+cPickle.dump({'distribution':freq,'cutoff':cutoff},open('freqdist_2.pkl',WRITE))
 #pprint(vocab)

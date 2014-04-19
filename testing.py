@@ -17,9 +17,10 @@ lmtzr = nltk.stem.wordnet.WordNetLemmatizer()
 
 #testing case 1: yes
 #testing case 2: #the
-wordList= ['\'the']
+wordList= ['\'the', 'the', '"the']
 print wordList
 wordList2 = [word.translate(None, string.punctuation) for word in wordList]
+#wordList2 = [filter(lambda char: char in exclude,word) for word in wordList]
 print wordList2
 #answer = [lmtzr.lemmatize(word.lower()) for word in wordList word.translate(None, string.punctuation)]
 answer = [lmtzr.lemmatize(word.lower()) for word in wordList2]
@@ -27,7 +28,7 @@ print answer
 
 #word = ''.join(wordList)
 #print word
-freq = nltk.FreqDist(wordList)
+freq = nltk.FreqDist(wordList2)
 print freq
 
 
