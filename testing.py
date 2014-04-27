@@ -1,11 +1,9 @@
-# -*- coding: utf-8 -*-
-
-import nltk, os, json, csv, string, cPickle
+import nltk, os, json, csv, string, cPickle, sys
 from scipy.stats import scoreatpercentile
 
 #print string.punctuation
 # ! " # $ & ' ( ) * + , - . / : ; < = > ? @ [ \ ] ^ _ {| } ~
-
+print (sys.version)
 exclude = set(string.punctuation)
 
 lmtzr = nltk.stem.wordnet.WordNetLemmatizer()
@@ -19,12 +17,14 @@ lmtzr = nltk.stem.wordnet.WordNetLemmatizer()
 #testing case 2: #the
 wordList= ['\'the', 'the', '"the']
 print wordList
+remove_punctuation_map = dict((ord(char), None) for char in string.punctuation)
+#wordList2 = [word.translate(remove_punctuation_map) for word in wordList]
 wordList2 = [word.translate(None, string.punctuation) for word in wordList]
-#wordList2 = [filter(lambda char: char in exclude,word) for word in wordList]
 print wordList2
 #answer = [lmtzr.lemmatize(word.lower()) for word in wordList word.translate(None, string.punctuation)]
 answer = [lmtzr.lemmatize(word.lower()) for word in wordList2]
 print answer
+
 
 #word = ''.join(wordList)
 #print word

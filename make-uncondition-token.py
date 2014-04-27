@@ -1,12 +1,17 @@
-import nltk, os, json, csv, string, cPickle
+import nltk, os, json, csv, string, cPickle, sys, unicodedata
 from scipy.stats import scoreatpercentile
 
 from pprint import pprint
+
+print (sys.version)
 #from progress.bar import Bar
 READ = 'rb'
 WRITE = 'wb'
 stopwords = set(open('stopwords',READ).read().splitlines())
 exclude = set(string.punctuation)
+
+tbl = dict.fromkeys(i for i in xrange(sys.maxunicode)
+                      if unicodedata.category(unichr(i)).startswith('P'))
 
 #lemmatizer
 lmtzr = nltk.stem.wordnet.WordNetLemmatizer()
@@ -19,7 +24,15 @@ json_list = [os.path.join(base,datafile)
 #wordList: each tweet
 def sanitize(wordList): 
 	#Lemmatize
-	answer = [word.translate(None, string.punctuation) for word in wordList] #testing membership is faster in set
+	#remove_punctuation_map = dict((ord(char), None) for char in string.punctuation)
+    #word_list = [s.translate(remove_punctuation_map) for s in value_list]
+	#for word in wordList:
+	#	for item in word:
+	#		answer = [item.translate(exclude)]
+	#answer = [word.translate(None, exclude) for word in wordList] #testing membership is faster in set
+	#answer = [word.translate(remove_punctuation_map) for word in wordList]
+	
+	answer = [word.translate(tbl) for word in wordList]
 	
 	#Remove stopwords
 	answer = list(set(answer)-stopwords)
@@ -32,14 +45,24 @@ def sanitize(wordList):
 	answer = [lmtzr.lemmatize(word.lower()) for word in answer]
 	return answer
 
+	
 words = []
 #bar = Bar('Converting JSON files to proper text',max=len(json_list))
+
 for filename in json_list:
-	words.extend([sanitize(' '.join([tweet['text']
-			for tweet in json.load(open(filename,READ))]).split())])
+	words.extend([sanitize(nltk.word_tokenize(' '.join([tweet['text'] 
+                       for tweet in json.load(open(filename,READ))])))])
+
+'''
+
+for filename in json_list:
+	print filename
+	for tweet in json.load(open(filename,READ)):
+		print sanitize(nltk.word_tokenize(' '.join([tweet['text']])))
+		
+'''		
 #bar.next()
 #bar.finish()
-
 
 
 #line graph: freq.plot(10) -> 10 most common words
