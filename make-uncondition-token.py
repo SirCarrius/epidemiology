@@ -1,5 +1,6 @@
 import nltk, os, json, csv, string, cPickle, sys, unicodedata
 from scipy.stats import scoreatpercentile
+import regex as re
 
 from pprint import pprint
 
@@ -10,8 +11,8 @@ WRITE = 'wb'
 stopwords = set(open('stopwords',READ).read().splitlines())
 exclude = set(string.punctuation)
 
-tbl = dict.fromkeys(i for i in xrange(sys.maxunicode)
-                      if unicodedata.category(unichr(i)).startswith('P'))
+#tbl = dict.fromkeys(i for i in xrange(sys.maxunicode)
+#                      if unicodedata.category(unichr(i)).startswith('P'))
 
 #lemmatizer
 lmtzr = nltk.stem.wordnet.WordNetLemmatizer()
@@ -31,8 +32,8 @@ def sanitize(wordList):
 	#		answer = [item.translate(exclude)]
 	#answer = [word.translate(None, exclude) for word in wordList] #testing membership is faster in set
 	#answer = [word.translate(remove_punctuation_map) for word in wordList]
-	
-	answer = [word.translate(tbl) for word in wordList]
+	answer = [re.sub(ur"\p{P}+", "", word) for word in wordList]
+	#answer = [word.translate(tbl) for word in wordList]
 	
 	#Remove stopwords
 	answer = list(set(answer)-stopwords)
